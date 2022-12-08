@@ -64,7 +64,7 @@ jobs:
       - name: Install pacman
         run: |
           # Add ubuntu 22.10 repo to sources
-          echo "deb http://archive.ubuntu.com/ubuntu kinetic main universe" >> /etc/apt/sources.list
+          echo "deb http://archive.ubuntu.com/ubuntu kinetic main universe" | sudo tee -a /etc/apt/sources.list
           # Update apt sources
           sudo apt-get update
           # Install pacman-package-manager from ubuntu 22.10 repo
