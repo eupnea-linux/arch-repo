@@ -42,7 +42,7 @@ jobs:
           
           # Combine remote shas into one string with a line break (for writing to a file in the next job)
           combined_remote_shas="$postinstall_latest_sha"$'\n'"$audio_latest_sha"
-          echo "combined_remote_shas=$combined_remote_shas" >> $GITHUB_OUTPUT
+          # echo "combined_remote_shas=$combined_remote_shas" >> $GITHUB_OUTPUT
   
 
   deploy-repo:
