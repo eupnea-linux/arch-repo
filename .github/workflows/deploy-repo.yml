@@ -73,7 +73,7 @@ jobs:
         run: |
           CURRENT_VERSION=$(sed -n '3p' PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
           NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
-          sed -i "3s/.*/pkgver=${NEXTVERSION}/" PKGBUILD # update version in control file
+          sed -i "3s/.*/${NEXTVERSION}/" PKGBUILD # update version in control file
 
       - name: Creating arch package
         run: makepkg -s
