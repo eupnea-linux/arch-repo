@@ -82,12 +82,12 @@ jobs:
       - name: Setting up arch repo
         run: bash create_repo.sh
 
-      - name: Updating files in main repo
+      - name: Updating files in main branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: Update files in main repo
+          commit_message: Update files in main branch
           # Only include needed files
           file_pattern: 'PKGBUILD sha_cache.txt'
 
