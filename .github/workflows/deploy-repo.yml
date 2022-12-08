@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: check-sha # needs for the vars from the previous job
     # Only run script when remote sha has changed, aka the results DON'T match
-    if: needs.check-shas.outputs.match_results == 'false'
+    if: needs.check-sha.outputs.match_results == 'false'
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -61,14 +61,26 @@ jobs:
           combined_remote_shas=
           echo "${{ needs.check-shas.outputs.postinstall_remote_sha }}"$'\n'"${{ needs.check-shas.outputs.audio_remote_sha }}" > ./sha_cache.txt
 
-      - name: Bump version in control file
+      - name: Install pacman
         run: |
-          CURRENT_VERSION=$(sed -n '2p' control | sed 's/.*://' | xargs) # get current version from control file
-          NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
-          sed -i "2s/.*/Version: ${NEXTVERSION}/" control # update version in control file
+          # Add ubuntu 22.10 repo to sources
+          echo "deb http://archive.ubuntu.com/ubuntu kinetic main universe" >> /etc/apt/sources.list
+          # Update apt sources
+          sudo apt-get update
+          # Install pacman-package-manager from ubuntu 22.10 repo
+          sudo apt-get -y install pacman-package-manager libarchive-tools
 
-      - name: Creating debian package
-        run: bash pack-deb.sh
+      - name: Bump version in PKGBUILD file
+        run: |
+          CURRENT_VERSION=$(sed -n '3p' PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
+          NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
+          sed -i "3s/.*/pkgver=${NEXTVERSION}/" PKGBUILD # update version in control file
+
+      - name: Creating arch package
+        run: makepkg -s
+
+      - name: Setting up arch repo
+        run: bash create_repo.sh
 
       - name: Updating files in main repo
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -77,20 +89,16 @@ jobs:
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main repo
           # Only include needed files
-          file_pattern: 'control sha_cache.txt'
+          file_pattern: 'PKGBUILD sha_cache.txt'
 
       - name: Deploying repo
-        uses: smeinecke/apt-repo-action@v2.1.1
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          repo_supported_arch: amd64
-          repo_supported_version: |
-            kinetic
-            jammy
-            stable
-          file: eupnea-utils*.deb
-          file_target_version: kinetic
-          public_key: ${{ secrets.PUBLIC }}
-          private_key: ${{ secrets.PRIVATE }}
-          key_passphrase: ""
-          repo_folder: "debian_ubuntu"
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Deploy arch-repo
+          branch: gh-pages
+          create_branch: true
+          # Only include needed files
+          file_pattern: 'repo-out/* public_key.gpg'
+          push_options: '--force'
