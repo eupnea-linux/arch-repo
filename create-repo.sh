@@ -17,7 +17,7 @@ cd repo-out/eupnea-utils/os/any
 # Copy packages
 cp -r ../../../../*.pkg.tar.gz .
 # Sign packages
-gpg --output eupnea-utils.pkg.tar.gz.sig --detach-sig eupnea-utils*.pkg.tar.gz
+gpg --detach-sig eupnea-utils*.pkg.tar.gz
 
 # Create repo and sign it
 repo-add -s ./eupnea-utils.db.tar.gz *.pkg.tar.gz
