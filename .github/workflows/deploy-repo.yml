@@ -6,23 +6,26 @@ on:
     - cron: "10 0 * * *" # run at the start of every day after script repos update
   workflow_dispatch:
 
+env:
+  public_key: ${{ secrets.PUBLIC }}
+  private_key: ${{ secrets.PRIVATE }}
+
 jobs:
   check-sha:
     runs-on: ubuntu-22.04
     outputs:
-      postinstall_match_results: ${{ steps.check-shas.outputs.postinstall_results }}
-      audio_match_results: ${{ steps.check-shas.outputs.audio_results }}
+      match_results: ${{ steps.check-shas.outputs.match_results }}
       combined_remote_shas: ${{ steps.check-shas.outputs.combined_remote_shas }}
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-      
+
       - name: Download remote commit shas
         id: check-shas
         run: |
-          # Download shas
+          # Download remote shas
           postinstall_latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/postinstall-scripts/commits/main | jq -r '.sha')
           audio_latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/audio-scripts/commits/main | jq -r '.sha')
           
@@ -30,21 +33,23 @@ jobs:
           postinstall_match_results=$([[ "$(cat sha_cache.txt | head -1)" == "$postinstall_latest_sha" ]] && echo "true" || echo "false")
           audio_match_results=$([[ "$(cat sha_cache.txt | tail -1)" == "$audio_latest_sha" ]] && echo "true" || echo "false")
           
-          # Store match results
-          echo "postinstall_match_results=$postinstall_match_results" >> $GITHUB_OUTPUT
-          echo "audio_match_results=$audio_match_results" >> $GITHUB_OUTPUT
+          # Compare results and determine if there was an update in any of the repos
+          if [[ "$postinstall_match_results" == "true" && "$audio_match_results" == "true" ]]; then
+            echo "match_results=true" >> $GITHUB_OUTPUT
+          else
+            echo "match_results=false" >> $GITHUB_OUTPUT
+          fi
           
-          echo "remote_sha=$temp_sha" >> $GITHUB_OUTPUT
-          temp_match_results=$([[ "$(cat last_commit_sha.txt)" == "$temp_sha" ]] && echo "true" || echo "false")
-          echo "Match results are:"
-          echo $temp_match_results
-          echo "results=$temp_match_results" >> $GITHUB_OUTPUT
-      
+          # Combine remote shas into one string with a line break (for writing to a file in the next job)
+          combined_remote_shas="$postinstall_latest_sha"$'\n'"$audio_latest_sha"
+          echo "combined_remote_shas=$combined_remote_shas" >> $GITHUB_OUTPUT
+  
+
   deploy-repo:
     runs-on: ubuntu-22.04
-    needs: check-sha # only run if check-sha was successfull
-    # Only run script when remote sha has changed, aka the results DONT match
-    if: needs.check-sha.outputs.sha_match == 'false'
+    needs: check-sha # needs for the vars from the previous job
+    # Only run script when remote sha has changed, aka the results DON'T match
+    if: needs.check-shas.outputs.match_results == 'false'
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -52,7 +57,7 @@ jobs:
           fetch-depth: 1
 
       - name: Update local commit sha file
-        run: echo "${{ needs.check-sha.outputs.remote_sha }}" > ./last_commit_sha.txt
+        run: echo "${{ needs.check-shas.outputs.combined_remote_shas }}" > ./sha_cache.txt
       
       - name: Bump version in control file
         run: |
@@ -70,7 +75,7 @@ jobs:
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main repo
           # Only include needed files
-          file_pattern: 'control last_commit_sha.txt'
+          file_pattern: 'control sha_cache.txt'
 
       - name: Deploying repo
         uses: smeinecke/apt-repo-action@v2.1.1
