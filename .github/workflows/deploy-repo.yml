@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       match_results: ${{ steps.check-shas.outputs.match_results }}
-      combined_remote_shas: ${{ steps.check-shas.outputs.combined_remote_shas }}
+      postinstall_remote_sha: ${{ steps.check-shas.outputs.postinstall_remote_sha }}
+      audio_remote_sha: ${{ steps.check-shas.outputs.audio_remote_sha }}
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -40,10 +41,9 @@ jobs:
             echo "match_results=false" >> $GITHUB_OUTPUT
           fi
           
-          # Combine remote shas into one string with a line break (for writing to a file in the next job)
-          combined_remote_shas="$postinstall_latest_sha"$'\n'"$audio_latest_sha"
-          # echo "combined_remote_shas=$combined_remote_shas" >> $GITHUB_OUTPUT
-  
+          # Add shas to output
+          echo "postinstall_remote_sha=$postinstall_latest_sha" >> $GITHUB_OUTPUT
+          echo "audio_remote_sha=$audio_latest_sha" >> $GITHUB_OUTPUT
 
   deploy-repo:
     runs-on: ubuntu-22.04
@@ -56,9 +56,11 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Update local commit sha file
-        run: echo "${{ needs.check-shas.outputs.combined_remote_shas }}" > ./sha_cache.txt
-      
+      - name: Update local commits sha file
+        run: |
+          combined_remote_shas=
+          echo "${{ needs.check-shas.outputs.postinstall_remote_sha }}"$'\n'"${{ needs.check-shas.outputs.audio_remote_sha }}" > ./sha_cache.txt
+
       - name: Bump version in control file
         run: |
           CURRENT_VERSION=$(sed -n '2p' control | sed 's/.*://' | xargs) # get current version from control file
