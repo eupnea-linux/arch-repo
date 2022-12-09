@@ -14,18 +14,19 @@ prepare() {
 }
 
 package () {
-	# Make dirs
+  # Make dirs
   mkdir -p $pkgdir/etc/eupnea
-	mkdir -p $pkgdir/usr/bin
+  mkdir -p $pkgdir/usr/bin
   mkdir -p $pkgdir/usr/lib
     
   # Copy config files
   cp -r $srcdir/postinstall-scripts/configs/* $pkgdir/etc/eupnea
-	cp -r $srcdir/audio-scripts/configs/* $pkgdir/etc/eupnea
+  cp -r $srcdir/audio-scripts/configs/* $pkgdir/etc/eupnea
   
   # Copy scripts
-	install -Dm 755 $srcdir/postinstall-scripts/scripts/* $pkgdir/usr/bin
-	install -Dm 755 $srcdir/audio-scripts/setup-audio $pkgdir/usr/bin
-	# Copy functions script
+  install -Dm 755 $srcdir/postinstall-scripts/user-scripts/* $pkgdir/usr/bin
+  cp $srcdir/postinstall-scripts/system-scripts/* $pkgdir/usr/lib
+  install -Dm 755 $srcdir/audio-scripts/setup-audio $pkgdir/usr/bin
+  # Copy functions script
   cp $srcdir/postinstall-scripts/functions.py $pkgdir/usr/lib
 }
