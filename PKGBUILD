@@ -17,7 +17,7 @@ package () {
   # Make dirs
   mkdir -p $pkgdir/etc/eupnea
   mkdir -p $pkgdir/usr/bin
-  mkdir -p $pkgdir/usr/lib
+  mkdir -p $pkgdir/usr/lib/eupnea
     
   # Copy config files
   cp -r $srcdir/postinstall-scripts/configs/* $pkgdir/etc/eupnea
@@ -25,8 +25,9 @@ package () {
   
   # Copy scripts
   install -Dm 755 $srcdir/postinstall-scripts/user-scripts/* $pkgdir/usr/bin
-  cp $srcdir/postinstall-scripts/system-scripts/* $pkgdir/usr/lib
   install -Dm 755 $srcdir/audio-scripts/setup-audio $pkgdir/usr/bin
-  # Copy functions script
-  cp $srcdir/postinstall-scripts/functions.py $pkgdir/usr/lib
+
+  # Copy libs
+  cp $srcdir/postinstall-scripts/system-scripts/* $pkgdir/usr/lib/eupnea
+  cp $srcdir/postinstall-scripts/functions.py $pkgdir/usr/lib/eupnea
 }
