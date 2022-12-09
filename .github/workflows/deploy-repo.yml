@@ -99,5 +99,5 @@ jobs:
           branch: gh-pages
           create_branch: true
           # Only include needed files
-          file_pattern: 'repo-out/* public_key.gpg'
+          file_pattern: 'eupnea-utils/* public_key.gpg'
           push_options: '--force'
