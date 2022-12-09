@@ -11,11 +11,11 @@ gpg --import gpg-private-key.gpg
 echo "$public_key" >public_key.gpg
 
 # Create dirs
-mkdir -p repo-out/eupnea-utils/os/any
-cd repo-out/eupnea-utils/os/any
+mkdir -p eupnea-utils/os/any
+cd eupnea-utils/os/any
 
 # Copy packages
-cp -r ../../../../*.pkg.tar.gz .
+cp -r ../../../*.pkg.tar.gz .
 # Sign packages
 gpg --detach-sig eupnea-utils*.pkg.tar.gz
 
