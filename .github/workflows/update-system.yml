@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       match_results: ${{ steps.check-shas.outputs.match_results }}
-      remote_sha: ${{ steps.check-shas.outputs.postinstall_remote_sha }}
+      remote_sha: ${{ steps.check-shas.outputs.remote_sha }}
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
