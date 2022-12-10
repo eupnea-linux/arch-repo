@@ -1,0 +1,91 @@
+name: Deploying arch repo
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 0 * * *" # run at the start of every day
+  workflow_dispatch:
+
+env:
+  public_key: ${{ secrets.PUBLIC }}
+  private_key: ${{ secrets.PRIVATE }}
+
+jobs:
+  check-sha:
+    runs-on: ubuntu-22.04
+    outputs:
+      match_results: ${{ steps.check-shas.outputs.match_results }}
+      remote_sha: ${{ steps.check-shas.outputs.postinstall_remote_sha }}
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Download remote commit shas
+        id: check-shas
+        run: |
+          # Download remote sha
+          latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/system-update/commits/main | jq -r '.sha')
+          
+          # Check remote sha against cached one
+          match_results=$([[ "$(cat system-sha_cache.txt)" == "$latest_sha" ]] && echo "true" || echo "false")
+          echo "match_results=$match_results" >> $GITHUB_OUTPUT
+          
+          # Add sha to output
+          echo "remote_sha=$latest_sha" >> $GITHUB_OUTPUT
+
+  deploy-repo:
+    runs-on: ubuntu-22.04
+    needs: check-sha # needs for the vars from the previous job
+    # Only run script when remote sha has changed, aka the results DON'T match
+    if: needs.check-sha.outputs.match_results == 'false'
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Update local commits sha file
+        run: |
+          echo "${{ needs.check-sha.outputs.remote_sha }}" > system-sha_cache.txt
+
+      - name: Install pacman
+        run: |
+          # Add ubuntu 22.10 repo to sources
+          echo "deb http://archive.ubuntu.com/ubuntu kinetic main universe" | sudo tee -a /etc/apt/sources.list
+          # Update apt sources
+          sudo apt-get update
+          # Install pacman-package-manager from ubuntu 22.10 repo
+          sudo apt-get -y install pacman-package-manager libarchive-tools
+
+      - name: Bump version in PKGBUILD file
+        run: |
+          CURRENT_VERSION=$(sed -n '3p' SYSTEM-PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
+          NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
+          sed -i "3s/.*/${NEXTVERSION}/" SYSTEM-PKGBUILD # update version in control file
+
+      - name: Packing eupnea-system package
+        run: makepkg -p SYSTEM-PKGBUILD
+
+      - name: Setting up arch repo
+        run: bash create-repo.sh
+
+      - name: Updating files in main branch
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Update files in main branch
+          file_pattern: 'UTILS-SYSTEM system-sha_cache.txt'
+
+      - name: Deploying repo
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Deploy arch-repo
+          branch: gh-pages
+          create_branch: true
+          # Only include needed files
+          file_pattern: 'eupnea/* public_key.gpg'

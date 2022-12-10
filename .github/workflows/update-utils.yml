@@ -30,9 +30,9 @@ jobs:
           postinstall_latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/postinstall-scripts/commits/main | jq -r '.sha')
           audio_latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/audio-scripts/commits/main | jq -r '.sha')
           
-          # Check remote shas agains cached ones
-          postinstall_match_results=$([[ "$(cat sha_cache.txt | head -1)" == "$postinstall_latest_sha" ]] && echo "true" || echo "false")
-          audio_match_results=$([[ "$(cat sha_cache.txt | tail -1)" == "$audio_latest_sha" ]] && echo "true" || echo "false")
+          # Check remote shas against cached ones
+          postinstall_match_results=$([[ "$(cat utils_sha-cache.txt | head -1)" == "$postinstall_latest_sha" ]] && echo "true" || echo "false")
+          audio_match_results=$([[ "$(cat utils_sha-cache.txt | tail -1)" == "$audio_latest_sha" ]] && echo "true" || echo "false")
           
           # Compare results and determine if there was an update in any of the repos
           if [[ "$postinstall_match_results" == "true" && "$audio_match_results" == "true" ]]; then
@@ -58,7 +58,7 @@ jobs:
 
       - name: Update local commits sha file
         run: |
-          echo "${{ needs.check-sha.outputs.postinstall_remote_sha }}"$'\n'"${{ needs.check-sha.outputs.audio_remote_sha }}" > sha_cache.txt
+          echo "${{ needs.check-sha.outputs.postinstall_remote_sha }}"$'\n'"${{ needs.check-sha.outputs.audio_remote_sha }}" > utils_sha-cache.txt
 
       - name: Install pacman
         run: |
@@ -71,12 +71,15 @@ jobs:
 
       - name: Bump version in PKGBUILD file
         run: |
-          CURRENT_VERSION=$(sed -n '3p' PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
+          CURRENT_VERSION=$(sed -n '3p' UTILS-PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
           NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
-          sed -i "3s/.*/${NEXTVERSION}/" PKGBUILD # update version in control file
+          sed -i "3s/.*/${NEXTVERSION}/" UTILS-PKGBUILD # update version in control file
 
-      - name: Creating arch package
-        run: makepkg -s
+      - name: Packing eupnea-utils package
+        run: makepkg -p UTILS-PKGBUILD
+
+      - name: Packing eupnea-system package
+        run: makepkg -p SYSTEM-PKGBUILD
 
       - name: Setting up arch repo
         run: bash create-repo.sh
@@ -87,8 +90,7 @@ jobs:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main branch
-          # Only include needed files
-          file_pattern: 'PKGBUILD sha_cache.txt'
+          file_pattern: 'UTILS-PKGBUILD utils_sha-cache.txt'
 
       - name: Deploying repo
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -99,5 +101,4 @@ jobs:
           branch: gh-pages
           create_branch: true
           # Only include needed files
-          file_pattern: 'eupnea-utils/* public_key.gpg'
-          push_options: '--force'
+          file_pattern: 'eupnea/* public_key.gpg'

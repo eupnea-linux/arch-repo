@@ -1,0 +1,28 @@
+# Maintainer: The Eupnea Project
+pkgname=eupnea-system
+pkgver=1.0
+pkgrel=1
+pkgdesc="This package upgrades Depthboot/EupneaOS systems to the latest version."
+arch=(any)
+url="https://eupnea-linux.github.io/"
+license=('GPL3')
+
+prepare() {
+  git clone --depth=1 https://github.com/eupnea-linux/system-update.git
+}
+
+package () {
+  # Make dirs
+  mkdir -p $pkgdir/tmp/eupnea-system-update/configs/
+  mkdir -p $pkgdir/usr/share/libalpm/hooks/
+
+  # Copy config files
+  cp -r $srcdir/system-update/configs/* $pkgdir/tmp/eupnea-system-update/configs/
+
+  # Copy the update script and functions.py
+  install -Dm 755 $srcdir/system-update/system-update.py $pkgdir/tmp/eupnea-system-update
+  cp $srcdir/system-update/functions.py $pkgdir/tmp/eupnea-system-update
+
+  # Copy the hook
+  cp $srcdir/eupnea-system.hook $pkgdir/usr/share/libalpm/hooks/
+}

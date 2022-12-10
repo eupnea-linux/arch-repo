@@ -1,0 +1,10 @@
+# Execute system-update.py in /tmp/eupnea-system-update, to upgrade the system to a new version
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = eupnea-system
+
+[Action]
+When = PostTransaction
+Exec = /tmp/eupnea-system-update/system-update.py
