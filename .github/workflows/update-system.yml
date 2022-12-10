@@ -79,7 +79,9 @@ jobs:
           
           # Delete old system packages
           rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz
-          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz.sig
+
+          # Delete old signatures
+          rm -rf eupnea/os/any/*.sig
 
       - name: Setting up arch repo
         run: bash create-repo.sh
