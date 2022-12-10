@@ -78,6 +78,19 @@ jobs:
       - name: Packing eupnea-utils package
         run: makepkg -p UTILS-PKGBUILD
 
+      - name: Downloading old repo
+        run: |
+          # Download old repo.
+          # Exit in case the branch doesn't exist yet
+          git clone --branch=gh-pages https://github.com/eupnea-linux/arch-repo /tmp/arch-repo || exit 1
+          
+          # Copy old repo to current directory
+          cp -r /tmp/arch-repo/eupnea .
+          
+          # Delete old system packages
+          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz
+          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz.sig
+
       - name: Setting up arch repo
         run: bash create-repo.sh
 

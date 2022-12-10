@@ -20,6 +20,4 @@ cp -r ../../../*.pkg.tar.gz .
 gpg --detach-sig eupnea*.pkg.tar.gz
 
 # Create repo and sign it
-# Copy old package db if it exists
-cp ../../../eupnea.db.tar.gz . || true
 repo-add -s ./eupnea.db.tar.gz *.pkg.tar.gz
