@@ -1,4 +1,4 @@
-name: Deploying arch repo
+name: Updating system package
 on:
   push:
     branches: [ "main" ]

@@ -1,4 +1,4 @@
-name: Deploying arch repo
+name: Updating utils
 on:
   push:
     branches: [ "main" ]
