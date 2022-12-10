@@ -77,7 +77,7 @@ jobs:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main branch
-          file_pattern: 'UTILS-SYSTEM system-sha_cache.txt'
+          file_pattern: 'SYSTEM-PKGBUILD system-sha_cache.txt'
 
       - name: Deploying repo
         uses: stefanzweifel/git-auto-commit-action@v4
