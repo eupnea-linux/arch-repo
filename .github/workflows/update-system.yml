@@ -78,7 +78,7 @@ jobs:
           cp -r /tmp/arch-repo/eupnea .
           
           # Delete old system packages
-          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz
+          rm -rf eupnea/os/any/eupnea-system*.pkg.tar.gz
 
           # Delete old signatures
           rm -rf eupnea/os/any/*.sig
