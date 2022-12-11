@@ -1,5 +1,8 @@
 # arch-repo
 Repo for arch packages.
+Currently has the following packages:
+* `eupnea-utils`: Provides eupnea scripts from the [postinstall](https://github.com/eupnea-linux/postinstall-scripts) and [audio](https://github.com/eupnea-linux/audio-scripts/) repos.
+* Does not install anything per se, but instead includes a postinstall hook, which executes [system-update.py](https://github.com/eupnea-linux/system-update) to upgrade between Depthboot/EupneaOS versions.
 # Add to system
 ```
 wget -O /tmp/eupnea.key https://eupnea-linux.github.io/arch-repo/public_key.gpg
