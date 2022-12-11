@@ -87,9 +87,11 @@ jobs:
           # Copy old repo to current directory
           cp -r /tmp/arch-repo/eupnea .
           
-          # Delete old system packages
-          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz
-          rm -rf eupnea/os/any/eupnea-system.pkg.tar.gz.sig
+          # Delete old util packages
+          rm -rf eupnea/os/any/eupnea-utils*.pkg.tar.gz
+
+          # Delete all signatures
+          rm -rf eupnea/os/any/*.sig
 
       - name: Setting up arch repo
         run: bash create-repo.sh
@@ -112,3 +114,4 @@ jobs:
           create_branch: true
           # Only include needed files
           file_pattern: 'eupnea/* public_key.gpg'
+          push_options: '--force'

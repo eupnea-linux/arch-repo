@@ -80,7 +80,7 @@ jobs:
           # Delete old system packages
           rm -rf eupnea/os/any/eupnea-system*.pkg.tar.gz
 
-          # Delete old signatures
+          # Delete all signatures
           rm -rf eupnea/os/any/*.sig
 
       - name: Setting up arch repo
