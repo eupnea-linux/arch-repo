@@ -1,6 +1,6 @@
 # Maintainer: The Eupnea Project
 pkgname=eupnea-system
-pkgver=1.8
+pkgver=1.9
 pkgrel=1
 pkgdesc="This package upgrades Depthboot/EupneaOS systems to the latest version."
 arch=(any)
