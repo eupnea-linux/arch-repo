@@ -104,3 +104,4 @@ jobs:
           create_branch: true
           # Only include needed files
           file_pattern: 'eupnea/* public_key.gpg'
+          push_options: '--force'
