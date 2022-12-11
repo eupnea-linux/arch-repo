@@ -19,9 +19,11 @@ package () {
   # Copy config files
   cp -r $srcdir/system-update/configs/* $pkgdir/tmp/eupnea-system-update/configs/
 
-  # Copy the update script and functions.py
+  # Copy the update scripts and functions.py
   install -Dm 755 $srcdir/system-update/system-update.py $pkgdir/tmp/eupnea-system-update
   cp $srcdir/system-update/functions.py $pkgdir/tmp/eupnea-system-update
+  cp $srcdir/system-update/eupnea_os_updates.py $pkgdir/tmp/eupnea-system-update
+  cp $srcdir/system-update/depthboot_updates.py $pkgdir/tmp/eupnea-system-update
 
   # Copy the hook
   cp $srcdir/system-update/eupnea-system.hook $pkgdir/usr/share/libalpm/hooks/
