@@ -19,6 +19,7 @@ cp -r ../../../*.pkg.tar.gz .
 # Sign packages
 echo "Signing packages"
 gpg --detach-sig eupnea*.pkg.tar.gz
+ls -a
 
 # Create repo and sign it
 repo-add -s ./eupnea.db.tar.gz *.pkg.tar.gz
