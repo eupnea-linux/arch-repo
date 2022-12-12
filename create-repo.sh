@@ -18,8 +18,9 @@ cd eupnea/os/any
 cp -r ../../../*.pkg.tar.gz .
 # Sign packages
 echo "Signing packages"
-gpg --detach-sig eupnea*.pkg.tar.gz
-ls -a
+# For some reason a eupnea* wildcard doesnt sign all packages
+gpg --detach-sig eupnea-system*.pkg.tar.gz
+gpg --detach-sig eupnea-utils*.pkg.tar.gz
 
 # Create repo and sign it
 repo-add -s ./eupnea.db.tar.gz *.pkg.tar.gz
