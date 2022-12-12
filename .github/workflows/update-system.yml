@@ -29,7 +29,7 @@ jobs:
           latest_sha=$(curl -s https://api.github.com/repos/eupnea-linux/system-update/commits/main | jq -r '.sha')
           
           # Check remote sha against cached one
-          match_results=$([[ "$(cat system-sha_cache.txt)" == "$latest_sha" ]] && echo "true" || echo "false")
+          match_results=$([[ "$(cat system_sha-cache.txt)" == "$latest_sha" ]] && echo "true" || echo "false")
           echo "match_results=$match_results" >> $GITHUB_OUTPUT
           
           # Add sha to output
@@ -48,7 +48,7 @@ jobs:
 
       - name: Update local commits sha file
         run: |
-          echo "${{ needs.check-sha.outputs.remote_sha }}" > system-sha_cache.txt
+          echo "${{ needs.check-sha.outputs.remote_sha }}" > system_sha-cache.txt
 
       - name: Install pacman
         run: |
@@ -92,7 +92,7 @@ jobs:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main branch
-          file_pattern: 'SYSTEM-PKGBUILD system-sha_cache.txt'
+          file_pattern: 'SYSTEM-PKGBUILD system_sha-cache.txt'
 
       - name: Deploying repo
         uses: stefanzweifel/git-auto-commit-action@v4
