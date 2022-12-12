@@ -10,6 +10,7 @@ license=('GPL3')
 
 prepare() {
   git clone --depth=1 https://github.com/eupnea-linux/system-update.git
+  git clone --depth=1 https://github.com/eupnea-linux/arch-repo.git
 }
 
 package () {
@@ -27,5 +28,5 @@ package () {
   cp $srcdir/system-update/depthboot_updates.py $pkgdir/tmp/eupnea-system-update
 
   # Copy the hook
-  cp $srcdir/eupnea-system.hook $pkgdir/usr/share/libalpm/hooks/
+  cp $srcdir/arch-repo/eupnea-system.hook $pkgdir/usr/share/libalpm/hooks/
 }
