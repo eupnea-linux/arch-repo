@@ -11,8 +11,8 @@ gpg --import gpg-private-key.gpg
 echo "$public_key" >public_key.gpg
 
 # Create dirs
-mkdir -p eupnea/os/any
-cd eupnea/os/any
+mkdir -p eupnea/os/x86_64
+cd eupnea/os/x86_64
 
 # Copy packages
 cp -r ../../../*.pkg.tar.gz .

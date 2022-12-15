@@ -4,9 +4,9 @@ pkgver=1.12
 pkgrel=1
 pkgdesc="This package upgrades Depthboot/EupneaOS systems to the latest version.
 Not recommended for use on non-Chromebook devices."
-arch=(any)
 url="https://eupnea-linux.github.io/"
-license=('GPL3')
+arch="x86_64"
+license=('GPLv3')
 
 prepare() {
   git clone --depth=1 https://github.com/eupnea-linux/system-update.git

@@ -4,9 +4,9 @@ pkgver=0.13
 pkgrel=1
 pkgdesc="This package contains a set of tools to interact with EupneaOS/Depthboot systems. 
 Not recommended for use on non-Chromebook devices."
-arch=(any)
 url="https://eupnea-linux.github.io/"
-license=('GPL3')
+arch="x86_64"
+license=('GPLv3')
 
 prepare() {
   git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts.git --branch=move-to-packages

@@ -1,4 +1,4 @@
-name: Updating utils
+name: Deploying utils packages
 on:
   push:
     branches: [ "main" ]
@@ -49,7 +49,7 @@ jobs:
           echo "postinstall_remote_sha=$postinstall_latest_sha" >> $GITHUB_OUTPUT
           echo "audio_remote_sha=$audio_latest_sha" >> $GITHUB_OUTPUT
 
-  deploy-repo:
+  deploy-utils-package:
     runs-on: ubuntu-22.04
     needs: check-sha # needs for the vars from the previous job
     # Only run script when remote sha has changed, aka the results DON'T match
@@ -92,10 +92,10 @@ jobs:
           cp -r /tmp/arch-repo/eupnea .
           
           # Delete old util packages
-          rm -rf eupnea/os/any/eupnea-utils*.pkg.tar.gz
+          rm -rf eupnea/os/x86_64/eupnea-utils*.pkg.tar.gz
 
           # Delete all signatures
-          rm -rf eupnea/os/any/*.sig
+          rm -rf eupnea/os/x86_64/*.sig
 
       - name: Setting up arch repo
         run: bash create-repo.sh
@@ -108,12 +108,12 @@ jobs:
           commit_message: Update files in main branch
           file_pattern: 'UTILS-PKGBUILD utils_sha-cache.txt'
 
-      - name: Deploying repo
+      - name: Deploying utils packages
         uses: stefanzweifel/git-auto-commit-action@v4.16.0
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: Deploy arch-repo
+          commit_message: Deploy utils packages
           branch: gh-pages
           create_branch: true
           # Only include needed files
