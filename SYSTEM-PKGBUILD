@@ -5,7 +5,7 @@ pkgrel=1
 pkgdesc="This package upgrades Depthboot/EupneaOS systems to the latest version.
 Not recommended for use on non-Chromebook devices."
 url="https://eupnea-linux.github.io/"
-arch="x86_64"
+arch=("x86_64")
 license=('GPLv3')
 
 prepare() {
