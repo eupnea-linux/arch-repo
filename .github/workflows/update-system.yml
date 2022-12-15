@@ -78,13 +78,13 @@ jobs:
           git clone --branch=gh-pages https://github.com/eupnea-linux/arch-repo /tmp/arch-repo || exit 0
           
           # Copy old repo to current directory
-          cp -r /tmp/arch-repo/eupnea .
+          cp -r /tmp/arch-repo/repodata .
           
           # Delete old system packages
-          rm -rf eupnea/os/x86_64/eupnea-system*.pkg.tar.gz
+          rm -rf repodata/x86_64/eupnea-system*.pkg.tar.gz
 
           # Delete all signatures
-          rm -rf eupnea/os/x86_64/*.sig
+          rm -rf repodata/x86_64/*.sig
 
       - name: Setting up arch repo
         run: bash create-repo.sh
@@ -106,5 +106,5 @@ jobs:
           branch: gh-pages
           create_branch: true
           # Only include needed files
-          file_pattern: 'eupnea/* public_key.gpg'
+          file_pattern: 'repodata/* public_key.gpg'
           push_options: '--force'
