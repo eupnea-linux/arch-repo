@@ -12,6 +12,7 @@ prepare() {
   git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts.git --branch=move-to-packages
   git clone --depth=1 https://github.com/eupnea-linux/audio-scripts.git
   git clone --depth=1 https://github.com/eupnea-linux/systemd-services --branch=move-to-packages
+  git clone --depth=1 https://github.com/eupnea-linux/arch-repo.git
 }
 
 package () {
