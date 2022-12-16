@@ -1,0 +1,11 @@
+# Enable systemd services after install
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = eupnea-utils
+
+[Action]
+When = PostTransaction
+Exec = systemctl enable eupnea-update.timer
+Exec = systemctl enable eupnea-postinstall.service

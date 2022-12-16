@@ -11,6 +11,7 @@ license=('GPLv3')
 prepare() {
   git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts.git --branch=move-to-packages
   git clone --depth=1 https://github.com/eupnea-linux/audio-scripts.git
+  git clone --depth=1 https://github.com/eupnea-linux/systemd-services --branch=move-to-packages
 }
 
 package () {
@@ -18,7 +19,9 @@ package () {
   mkdir -p $pkgdir/etc/eupnea
   mkdir -p $pkgdir/usr/bin
   mkdir -p $pkgdir/usr/lib/eupnea
-    
+  mkdir -p $pkgdir/etc/systemd/system/
+  mkdir -p $pkgdir/usr/share/libalpm/hooks/
+
   # Copy config files
   cp -r $srcdir/postinstall-scripts/configs/* $pkgdir/etc/eupnea
   cp -r $srcdir/audio-scripts/configs/* $pkgdir/etc/eupnea
@@ -27,7 +30,15 @@ package () {
   install -Dm 755 $srcdir/postinstall-scripts/user-scripts/* $pkgdir/usr/bin
   install -Dm 755 $srcdir/audio-scripts/setup-audio $pkgdir/usr/bin
 
+  # Copy systemd units
+  cp $srcdir/systemd-services/eupnea-update.service $pkgdir/etc/systemd/system/
+  cp $srcdir/systemd-services/eupnea-postinstall.service $pkgdir/etc/systemd/system/
+  cp $srcdir/systemd-services/eupnea-update.timer $pkgdir/etc/systemd/system/
+
   # Copy libs
   cp $srcdir/postinstall-scripts/system-scripts/* $pkgdir/usr/lib/eupnea
   cp $srcdir/postinstall-scripts/functions.py $pkgdir/usr/lib/eupnea
+
+  # Copy postinstall hook
+  cp $srcdir/arch-repo/eupnea-utils.hook $pkgdir/usr/share/libalpm/hooks/
 }
