@@ -41,8 +41,8 @@ jobs:
           fi
           
           # Add shas to output
-          echo "vboot_latest_sha=$vboot_latest_sha" >> $GITHUB_OUTPUT
-          echo "cgpt_latest_sha=$cgpt_latest_sha" >> $GITHUB_OUTPUT
+          echo "vboot_remote_sha=$vboot_latest_sha" >> $GITHUB_OUTPUT
+          echo "cgpt_remote_sha=$cgpt_latest_sha" >> $GITHUB_OUTPUT
 
   repackage-debs:
     runs-on: ubuntu-22.04
