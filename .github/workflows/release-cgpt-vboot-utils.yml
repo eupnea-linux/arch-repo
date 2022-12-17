@@ -98,4 +98,4 @@ jobs:
           body: |
             These are repackaged ubuntu deb packages for arch.
           files: |
-            ./cgpt-vboot-utils.pkg.tar.zst
+            ./cgpt-vboot-utils*.pkg.tar.zst
