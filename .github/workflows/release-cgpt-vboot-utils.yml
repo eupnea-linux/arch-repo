@@ -67,6 +67,7 @@ jobs:
           sudo apt-get update
           # Install pacman-package-manager from ubuntu 22.10 repo
           sudo apt-get -y install pacman-package-manager libarchive-tools
+          sudo pacman-db-upgrade
 
       - name: Bump version in PKGBUILD file
         run: |
