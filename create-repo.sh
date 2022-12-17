@@ -21,6 +21,7 @@ echo "Signing packages"
 # For some reason a eupnea* wildcard doesnt sign all packages
 gpg --detach-sig eupnea-system*.pkg.tar.gz || true
 gpg --detach-sig eupnea-utils*.pkg.tar.gz || true
+gpg --detach-sig cgpt-vboot-utils*.pkg.tar.gz || true
 
 # Create repo and sign it
 repo-add -s ./eupnea.db.tar.gz *.pkg.tar.gz

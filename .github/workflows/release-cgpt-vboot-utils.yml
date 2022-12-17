@@ -74,8 +74,26 @@ jobs:
           NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
           sed -i "3s/.*/${NEXTVERSION}/" CGPT_VBOOT-PKGBUILD # update version in control file
 
-      - name: Packing eupnea-system package
+      - name: Repacking cgpt-vboot package
         run: makepkg -p CGPT_VBOOT-PKGBUILD
+
+      - name: Downloading old repo
+        run: |
+          # Download old repo.
+          # Exit in case the branch doesn't exist yet
+          git clone --branch=gh-pages https://github.com/eupnea-linux/arch-repo /tmp/arch-repo || exit 0
+          
+          # Copy old repo to current directory
+          cp -r /tmp/arch-repo/repodata .
+          
+          # Delete old cgpt-vboot packages
+          rm -rf repodata/x86_64/cgpt-vboot-utils*.pkg.tar.gz
+
+          # Delete all signatures
+          rm -rf repodata/x86_64/*.sig
+
+      - name: Setting up arch repo
+        run: bash create-repo.sh
 
       - name: Updating files in repository
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -84,6 +102,18 @@ jobs:
           # Defaults to "Apply automatic changes"
           commit_message: Update files in main branch
           file_pattern: 'CGPT_VBOOT-PKGBUILD deb_sha-cache.txt'
+
+      - name: Deploying cgpt-vboot-utils package
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Deploy cgpt-vboot-utils package
+          branch: gh-pages
+          create_branch: true
+          # Only include needed files
+          file_pattern: 'repodata/* public_key.gpg'
+          push_options: '--force'
 
       - name: Generating release tag
         id: tag
