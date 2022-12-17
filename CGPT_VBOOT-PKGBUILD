@@ -6,6 +6,7 @@ pkgdesc="cgpt and vboot utils repackaged from Ubuntu debs. Will only build on sy
 url="https://chromium.googlesource.com/chromiumos/platform/vboot_reference"
 arch=("x86_64")
 license=('GPLv3')
+depends=('flashrom')
 
 # WARNING: This PKGBUILD will only work on systems with apt-get installed.
 prepare() {
