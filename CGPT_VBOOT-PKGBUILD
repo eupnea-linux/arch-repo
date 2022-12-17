@@ -1,5 +1,4 @@
 # Maintainer: The Eupnea Project
-
 pkgname=cgpt-vboot-utils
 pkgver=1.5
 pkgrel=1
