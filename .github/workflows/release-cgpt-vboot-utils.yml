@@ -79,7 +79,10 @@ jobs:
           sed -i "3s/.*/${NEXTVERSION}/" CGPT_VBOOT-PKGBUILD # update version in control file
 
       - name: Repacking cgpt-vboot package
-        run: makepkg --nodeps -p CGPT_VBOOT-PKGBUILD
+        run: |
+          # Set author in makepkg.conf
+          echo 'PACKAGER="The Eupnea Project <https://github.com/eupnea-linux>"' | sudo tee -a /etc/makepkg.conf
+          makepkg --nodeps -p CGPT_VBOOT-PKGBUILD
 
       - name: Downloading old repo
         run: |
