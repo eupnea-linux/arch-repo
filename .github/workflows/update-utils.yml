@@ -1,7 +1,5 @@
 name: Deploying utils packages
 on:
-  push:
-    branches: [ "main" ]
   schedule:
     - cron: "10 0 * * *" # run at the start of every day after script repos update
   workflow_dispatch:

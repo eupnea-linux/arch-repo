@@ -1,0 +1,101 @@
+# Unlike the other two workflows this one does not push to gh-pages, but creates a release instead.
+name: Repacking cgpt and vboot-utils
+on:
+  schedule:
+    - cron: "20 0 * * *" # run at the start of every day after utils and system packages are released
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-sha:
+    runs-on: ubuntu-22.04
+    outputs:
+      match_results: ${{ steps.check-shas.outputs.match_results }}
+      vboot_remote_sha: ${{ steps.check-shas.outputs.vboot_remote_sha }}
+      cgpt_remote_sha: ${{ steps.check-shas.outputs.cgpt_remote_sha }}
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Check if remote debs were updated
+        id: check-shas
+        run: |
+          # Download remote deb packages and calculate their SHA256 hashes
+          apt-get download cgpt vboot-kernel-utils
+          vboot_latest_sha=$(sha256sum vboot-kernel-utils*.deb | awk '{print $1}')
+          cgpt_latest_sha=$(sha256sum cgpt*.deb | awk '{print $1}')
+          
+          # Check remote shas against cached ones
+          vboot_match_results=$([[ "$(cat deb_sha-cache.txt | head -1)" == "vboot_latest_sha" ]] && echo "true" || echo "false")
+          cgpt_match_results=$([[ "$(cat deb_sha-cache.txt | tail -1)" == "cgpt_latest_sha" ]] && echo "true" || echo "false")
+          
+          # Compare results and determine if there was an update for any of the debs
+          if [[ "$vboot_match_results" == "true" && "$cgpt_match_results" == "true" ]]; then
+            echo "match_results=true" >> $GITHUB_OUTPUT
+          else
+            echo "match_results=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Add shas to output
+          echo "vboot_latest_sha=$vboot_latest_sha" >> $GITHUB_OUTPUT
+          echo "cgpt_latest_sha=$cgpt_latest_sha" >> $GITHUB_OUTPUT
+
+  repackage-debs:
+    runs-on: ubuntu-22.04
+    needs: check-sha # needs for the vars from the previous job
+    # Only run script when remote sha has changed, aka the results DON'T match
+    if: needs.check-sha.outputs.match_results == 'false'
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Update local commits sha file
+        run: |
+          echo "${{ needs.check-sha.outputs.vboot_remote_sha }}"$'\n'"${{ needs.check-sha.outputs.cgpt_remote_sha }}" > deb_sha-cache.txt
+
+      - name: Install pacman
+        run: |
+          # Add ubuntu 22.10 repo to sources
+          echo "deb http://archive.ubuntu.com/ubuntu kinetic main universe" | sudo tee -a /etc/apt/sources.list
+          # Update apt sources
+          sudo apt-get update
+          # Install pacman-package-manager from ubuntu 22.10 repo
+          sudo apt-get -y install pacman-package-manager libarchive-tools
+
+      - name: Bump version in PKGBUILD file
+        run: |
+          CURRENT_VERSION=$(sed -n '3p' CGPT_VBOOT-PKGBUILD | sed 's/.*://' | xargs) # get current version from control file
+          NEXTVERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}') # bump version
+          sed -i "3s/.*/${NEXTVERSION}/" CGPT_VBOOT-PKGBUILD # update version in control file
+
+      - name: Packing eupnea-system package
+        run: makepkg -p CGPT_VBOOT-PKGBUILD
+
+      - name: Updating files in repository
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Update files in main branch
+          file_pattern: 'CGPT_VBOOT-PKGBUILD deb_sha-cache.txt'
+
+      - name: Generating release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(date +"%Y.%m.%d_%H-%M")"
+
+      - name: Creating new release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          name: Automated cgpt-vboot-utils package creation - ${{ steps.tag.outputs.release_tag }}
+          body: |
+            These are repackaged ubuntu deb packages for arch.
+          files: |
+            ./cgpt-vboot-utils.pkg.tar.zst
