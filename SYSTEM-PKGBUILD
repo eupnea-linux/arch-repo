@@ -1,4 +1,5 @@
 # Maintainer: The Eupnea Project
+# Author: The Eupnea Project
 pkgname=eupnea-system
 pkgver=1.15
 pkgrel=1
