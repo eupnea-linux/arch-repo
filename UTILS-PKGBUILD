@@ -3,8 +3,7 @@
 pkgname=eupnea-utils
 pkgver=0.17
 pkgrel=1
-pkgdesc="This package contains a set of tools to interact with EupneaOS/Depthboot systems. 
-Not recommended for use on non-Chromebook devices."
+pkgdesc="This package contains a set of tools to interact with EupneaOS/Depthboot systems. Not recommended for use on non-Chromebook devices."
 url="https://eupnea-linux.github.io/"
 arch=("x86_64")
 license=('GPLv3')
