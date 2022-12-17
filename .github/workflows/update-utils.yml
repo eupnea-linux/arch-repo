@@ -78,7 +78,7 @@ jobs:
           sed -i "3s/.*/${NEXTVERSION}/" UTILS-PKGBUILD # update version in control file
 
       - name: Packing eupnea-utils package
-        run: makepkg --nodeps --debug -p UTILS-PKGBUILD
+        run: makepkg --nodeps -p UTILS-PKGBUILD
 
       - name: Downloading old repo
         run: |
