@@ -67,7 +67,7 @@ jobs:
           sed -i "3s/.*/${NEXTVERSION}/" SYSTEM-PKGBUILD # update version in control file
 
       - name: Packing eupnea-system package
-        run: makepkg -p SYSTEM-PKGBUILD
+        run: makepkg --nodeps -p SYSTEM-PKGBUILD
 
       - name: Downloading old repo
         run: |

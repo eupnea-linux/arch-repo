@@ -67,7 +67,6 @@ jobs:
           sudo apt-get update
           # Install pacman-package-manager from ubuntu 22.10 repo
           sudo apt-get -y install pacman-package-manager libarchive-tools
-          sudo pacman-db-upgrade
 
       - name: Bump version in PKGBUILD file
         run: |
@@ -76,7 +75,7 @@ jobs:
           sed -i "3s/.*/${NEXTVERSION}/" CGPT_VBOOT-PKGBUILD # update version in control file
 
       - name: Repacking cgpt-vboot package
-        run: makepkg -p CGPT_VBOOT-PKGBUILD
+        run: makepkg --nodeps -p CGPT_VBOOT-PKGBUILD
 
       - name: Downloading old repo
         run: |
