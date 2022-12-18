@@ -7,4 +7,4 @@ Target = eupnea-utils
 
 [Action]
 When = PostTransaction
-Exec = systemctl enable eupnea-update.timer eupnea-postinstall.service
+Exec = /usr/bin/systemctl enable eupnea-update.timer eupnea-postinstall.service
