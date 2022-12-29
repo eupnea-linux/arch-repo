@@ -1,6 +1,6 @@
 # Maintainer: The Eupnea Project
 pkgname=eupnea-utils
-pkgver=1.10
+pkgver=1.11
 pkgrel=1
 pkgdesc="This package contains a set of tools to interact with EupneaOS/Depthboot systems. 
 Not recommended for use on non-Chromebook devices."
