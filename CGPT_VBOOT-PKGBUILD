@@ -1,6 +1,6 @@
 # Maintainer: The Eupnea Project
 pkgname=cgpt-vboot-utils
-pkgver=1.21
+pkgver=1.22
 pkgrel=1
 pkgdesc="cgpt and vboot utils repackaged from Ubuntu debs. Will only build on systems with apt-get installed."
 url="https://chromium.googlesource.com/chromiumos/platform/vboot_reference"
